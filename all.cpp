@@ -135,7 +135,7 @@ int get_pivot(int arr[], int left, int right) {
   int n_groups =
       (n % 5 == 0) ? (n / 5) : (n / 5 + 1); // equivalent to ceil(n/5);
 
-  int group_medians[n_groups];
+  int * group_medians = (int*)malloc(n_groups * sizeof(int));
 
   int group_left;
   for (group_left = left; group_left < right; group_left += 5) {
@@ -147,6 +147,7 @@ int get_pivot(int arr[], int left, int right) {
   }
 
   int ret = alg1::select(group_medians, n_groups, n_groups / 2);
+  free(group_medians);
   return ret;
 }
 
