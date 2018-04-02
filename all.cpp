@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <random>
-
+#include <stdexcept>
 #include <ctime> // for performance timing
 
 const int SEED = 5000; // seed for random array
