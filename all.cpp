@@ -287,7 +287,7 @@ float* test_performance(int n){
   std::cout << std::setw(10) << n;
   for(int i=0; i<3; i++){
     arr = random_array(n, 1, n/100);
-    std::cout << std::setw(15) << performance(funs[i], arr, n);
+    std::cout << std::setw(15) << std::fixed << std::setprecision(2) << performance(funs[i], arr, n);
     free(arr);
   }
   std::cout << std::endl;
@@ -315,7 +315,7 @@ int main(){
   test_performance( 1e8);
   test_performance( 3e8);
   test_performance( 1e9);
-  test_performance( 3e9);
+  //test_performance( 3e9); warning: overflow in implicit constant conversion
 
   return 0;
 }
