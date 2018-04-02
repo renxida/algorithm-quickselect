@@ -306,12 +306,16 @@ int main(){
   }
   std::cout << std::endl;
   float* time_taken;
-  test_performance(  1e5);
-  test_performance(  3e5);
-  test_performance(  1e6);
-  test_performance(  3e6);
-  test_performance(  1e7);
-  test_performance(1.5e7);
+  test_performance( 1e5);
+  test_performance( 3e5);
+  test_performance( 1e6);
+  test_performance( 3e6);
+  test_performance( 1e7);
+  test_performance( 3e7);
+  test_performance( 1e8);
+  test_performance( 3e8);
+  test_performance( 1e9);
+  test_performance( 3e9);
 
   return 0;
 }
