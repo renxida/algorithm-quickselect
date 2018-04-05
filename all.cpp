@@ -31,8 +31,7 @@ int* random_array(int n, int mini, int maxi, int seed = SEED){
   std::mt19937 generator(seed);
   std::uniform_int_distribution<int> distribution(mini, maxi);
   int * arr = (int*)malloc(n * sizeof(int));
-  int i;
-  for (i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     arr[i] = distribution(generator);
   }
   return arr;
@@ -300,8 +299,7 @@ int main(){
   std::cout << "Tabulating performances for the algorithms." << std::endl;
   std::cout << "Units are in milliseconds." << std::endl;
   std::cout << std::setw(10) << "n";
-  int i;
-  for(i = 0; i < 3; i ++){
+  for(int i = 0; i < 3; i ++){
     std::cout << std::setw(15) << "algorithm " << i;
   }
   std::cout << std::endl;
