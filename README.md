@@ -66,3 +66,10 @@ the rest in performance due to its minimality. Deterministic
 quickselect finishes the job in about half the time as
 quicksort, as it does not produce a sorted array and saves
 a lot of comparisons.
+
+## __NOTE__
+__Each time the program generates the same random array unless
+you change the seed defined at the beginning. This is intended
+behavior, as I need to compare the programs output as I change
+things. You may want to change `SEED = 5000;` to read the
+current cpu clock as seed.__
