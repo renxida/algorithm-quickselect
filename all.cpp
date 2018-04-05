@@ -227,63 +227,79 @@ void correctness_row(int k) {
 /** driver function **/
 void correctness(void) {
   std::cout << "Tabulating correctness for the algorithms." << std::endl;
-  std::cout << "\tShowing output: kth smallest in array given in specification" << std::endl;
-  std::cout << "\tIndexing start at k=0 yielding smallest element." << std::endl;
-  std::cout << "------------------------------------------------------------\n";
-  std::cout << "|" << std::setw(10) << "n" << "|";
+  std::cout << "\tShowing output: kth smallest in array given in specification"
+            << std::endl;
+  std::cout << "\tIndexing start at k=0 yielding smallest element."
+            << std::endl;
+  std::cout << std::endl;
+  std::cout << "|" << std::setw(10) << "k"
+            << "|";
   for (int i = 0; i < 3; i++) {
     std::cout << std::setw(14) << "algorithm " << i + 1 << "|";
   }
   std::cout << std::endl;
-  std::cout << "------------------------------------------------------------\n";
-  for (int k = 0; k < 19; ++k) {
+  std::cout << "|:--------:|---------------|---------------|---------------|n";
+  for (int k = 0; k < 20; ++k) {
     correctness_row(k);
   }
-  std::cout << "------------------------------------------------------------\n";
+  std::cout << std::endl;
 }
 
 } // namespace test_correctness
 
-namespace test_corner_cases{
-  void corner_cases(){
-    std::cout << "Testing corner-cases for the algorithm." << std::endl;
-    // case 1
-    std::cout << "\t # selecting from 1-element array\n";
-    for(int i = 0; i < 3; ++i){
-      int output;
-      int arr[] = {998};
-      output = selection_functions[i](arr, 1, 0);
-      if(output == 998){
-        std::cout << "\t\t Success: algorithm " << i+1 << std::endl;
-      } else {
-        std::cout << "\t\t Fail: algorithm " << i+1 << std::endl;
-        std::cout << "\t\t\t Actual output: " << output << std::endl;
-      }
-    }
-    // case 2
-    std::cout << "\t # selecting from sorted length-3 array\n";
-    for(int i = 0; i < 3; ++i){
-      int result[3];
-      std::cout << "\t\t algorithm " << i+1 << " outputted { ";
-      for(int j = 0; j < 3; ++j){
-        int arr[] = {1,2,3};
-        std::cout << selection_functions[i](arr, 3, j) << " ";
-      }
-      std::cout << "}.\n";
-    }
-
-    std::cout << "\t # selecting from reverse-sorted length-3 array\n";
-    for(int i = 0; i < 3; ++i){
-      int result[3];
-      std::cout << "\t\t algorithm " << i+1 << " outputted { ";
-      for(int j = 0; j < 3; ++j){
-        int arr[] = {3,2,1};
-        std::cout << selection_functions[i](arr, 3, j) << " ";
-      }
-      std::cout << "}.\n";
+namespace test_corner_cases {
+void corner_cases() {
+  std::cout << "Testing corner-cases for the algorithm." << std::endl;
+  // case 1
+  std::cout << "\t * selecting from 1-element array\n";
+  for (int i = 0; i < 3; ++i) {
+    int output;
+    int arr[] = {998};
+    output = selection_functions[i](arr, 1, 0);
+    if (output == 998) {
+      std::cout << "\t\t * Success: algorithm " << i + 1 << std::endl;
+    } else {
+      std::cout << "\t\t * Fail: algorithm " << i + 1 << std::endl;
+      std::cout << "\t\t\t * Actual output: " << output << std::endl;
     }
   }
+  // case 2
+  std::cout << "\t * selecting from sorted length-3 array\n";
+  for (int i = 0; i < 3; ++i) {
+    int result[3];
+    std::cout << "\t\t * algorithm " << i + 1 << " outputted { ";
+    for (int j = 0; j < 3; ++j) {
+      int arr[] = {1, 2, 3};
+      std::cout << selection_functions[i](arr, 3, j) << " ";
+    }
+    std::cout << "}.\n";
+  }
+
+  std::cout << "\t * selecting from reverse-sorted length-3 array\n";
+  for (int i = 0; i < 3; ++i) {
+    int result[3];
+    std::cout << "\t\t * algorithm " << i + 1 << " outputted { ";
+    for (int j = 0; j < 3; ++j) {
+      int arr[] = {3, 2, 1};
+      std::cout << selection_functions[i](arr, 3, j) << " ";
+    }
+    std::cout << "}.\n";
+  }
+
+  // case 3: large array
+  std::cout << "\t * selecting from large random array\n";
+  std::cout << "\t   (the output should be around 5e6)\n";
+  int *arr_large;
+  int n_large = 1e7;
+  for (int i = 0; i < 3; ++i) {
+    arr_large = random_array(n_large, 1, n_large / 100);
+    std::cout << "\t\t * algorithm " << i + 1 << " outputted "
+              << selection_functions[i](arr_large, n_large, n_large / 2)
+              << std::endl;
+    free(arr_large);
+  }
 }
+} // namespace test_corner_cases
 
 namespace test_performance {
 float performance_cell(SelectFunctionPointer select, int *arr, int n) {
@@ -310,13 +326,14 @@ int performance() {
   // performance
   std::cout << "Tabulating performances for the algorithms." << std::endl;
   std::cout << "Units are in milliseconds." << std::endl;
-  std::cout << "------------------------------------------------------------\n";
-  std::cout << "|" << std::setw(10) << "n" << "|";
+  std::cout << std::endl;
+  std::cout << "|" << std::setw(10) << "n"
+            << "|";
   for (int i = 0; i < 3; i++) {
     std::cout << std::setw(14) << "algorithm " << i + 1 << "|";
   }
   std::cout << std::endl;
-  std::cout << "------------------------------------------------------------\n";
+  std::cout << "|:--------:|---------------|---------------|---------------|\n";
   float *time_taken;
   performance_row(1e5);
   performance_row(3e5);
@@ -327,14 +344,15 @@ int performance() {
   performance_row(1e8);
   performance_row(3e8);
   performance_row(1e9);
-  performance_row(3e9); //warning: overflow in implicit constant conversion
-  performance_row(1e10); //warning: overflow in implicit constant conversion
-  std::cout << "------------------------------------------------------------\n";
+  performance_row(3e9);  // warning: overflow in implicit constant conversion
+  performance_row(1e10); // warning: overflow in implicit constant conversion
+  std::cout << std::endl;
   return 0;
 }
 } // namespace test_performance
 
-int main(){
+int main() {
+  setbuf(stdout, NULL); // no buffer to make things look better
   test_correctness::correctness();
   test_corner_cases::corner_cases();
   test_performance::performance();
