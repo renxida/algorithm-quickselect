@@ -1,25 +1,17 @@
+#include "all.h"
 #include <cstdlib>
-#include <iostream>
+#include <ctime> // for performance timing
 #include <iomanip>
+#include <iostream>
 #include <random>
 #include <stdexcept>
-#include <ctime> // for performance timing
 
 const int SEED = 5000; // seed for random array
 
-namespace alg3 {
-void quickSort(int arr[], int left, int right);
-}
+const SelectFunctionPointer selection_functions[] = {alg1::select, alg2::select,
+                                                     alg3::select};
 
 /********************UTILITY FUNCTIONS****************/
-struct partition_result {
-  // represents partition result;
-  // arr[0:a] are less than pivot
-  // arr[a:b] are equal to pivot
-  // arr[b:n] are greater than pivot
-  int a;
-  int b;
-};
 
 void swap(int *a, int *b) {
   int tmp = *a;
@@ -27,10 +19,10 @@ void swap(int *a, int *b) {
   *b = tmp;
 }
 
-int* random_array(int n, int mini, int maxi, int seed = SEED){
+int *random_array(int n, int mini, int maxi, int seed = SEED) {
   std::mt19937 generator(seed);
   std::uniform_int_distribution<int> distribution(mini, maxi);
-  int * arr = (int*)malloc(n * sizeof(int));
+  int *arr = (int *)malloc(n * sizeof(int));
   for (int i = 0; i < n; i++) {
     arr[i] = distribution(generator);
   }
@@ -38,7 +30,8 @@ int* random_array(int n, int mini, int maxi, int seed = SEED){
 }
 
 struct partition_result partition(int arr[], int left, int right) {
-  // do three-way partition:
+  // do three-way partition
+  // returns struct partition_result with fields int a, int b.
   // [left, a) contains elements less than pivot
   // [a, b) contains elements equal to pivot
   // [b, right) contains element larger than pivot)
@@ -118,10 +111,6 @@ int select(int arr[], int n, int k) { return select_rec(arr, 0, n, k); }
 
 /*********************S2: deterministic***********************/
 namespace alg2 {
-int select(int arr[], int left,
-           int right); // need function prototype for recursion
-int select_rec(int arr[], int left, int right,
-               int k); // need function prototype for recursion
 
 int get_pivot(int arr[], int left, int right) {
   // returns pivot of arr[left:right], using medians-of-medians method
@@ -134,7 +123,7 @@ int get_pivot(int arr[], int left, int right) {
   int n_groups =
       (n % 5 == 0) ? (n / 5) : (n / 5 + 1); // equivalent to ceil(n/5);
 
-  int * group_medians = (int*)malloc(n_groups * sizeof(int));
+  int *group_medians = (int *)malloc(n_groups * sizeof(int));
 
   int group_left;
   for (group_left = left; group_left < right; group_left += 5) {
@@ -216,104 +205,136 @@ int select(int arr[], int n, int k) {
 
 } // namespace alg3
 
+namespace test_correctness {
 /*********************END QUICKSORT***************************/
-
-/** begin code for testing**/
-void correctness_1(int (*select)(int *, int, int)) {
-  // takes pointer *select as argument;
-  // tests select(arr, n, n/2) and prints output to screen
-  // if nothing goes wrong, this should be the median
-  // begin testcase 1
-  const int n = 20;
-  int arr[] = {7,  2, 4,  6, 9, 11, 2,  6, 10, 6,
-               15, 6, 14, 2, 7, 5,  13, 9, 12, 15};
-  std::cout << "\tCase 1: length-20 array given in specification" << std::endl;
-  const int median_1 = select(arr, n, n / 2);
-  std::cout << "\t\tMedian: " << median_1 << std::endl << std::endl;
+int correctness_cell(SelectFunctionPointer select, int k) {
+  int correctness_arr[] = {7,  2, 4,  6, 9, 11, 2,  6, 10, 6,
+                           15, 6, 14, 2, 7, 5,  13, 9, 12, 15};
+  int n = 20;
+  return select(correctness_arr, n, k);
 }
 
-void correctness_2(int (*select)(int *, int, int)) {
-  const int n = 10000;
-  int *arr;
-  arr = random_array(n, 1, n/100);
-  std::cout << "\tCase 2: " << n << " random ints" << std::endl;
-  const int median_2 = select(arr, n, n / 2);
-  std::cout << "\t\tMedian: " << median_2 << std::endl << std::endl;
-  free(arr);
-}
-/** end code for testing **/
+void correctness_row(int k) {
 
-void test_partition() {
-  int arr1[] = {4, 6, 14, 12};
-  int n1 = 4;
-  std::cout << "\tTesting partition on array\n\t";
-  printArray(arr1, n1);
-  struct partition_result ret1 = partition(arr1, 0, n1);
-  std::cout << "\ta: " << ret1.a << std::endl;
-  std::cout << "\tb: " << ret1.b << std::endl;
-  printArray(arr1, n1);
+  std::cout << "|" << std::setw(10) << k << "|";
+  for (int i = 0; i < 3; i++) {
+    std::cout << std::setw(15) << std::fixed << std::setprecision(2)
+              << correctness_cell(selection_functions[i], k) << "|";
+  }
+  std::cout << std::endl;
 }
 
 /** driver function **/
-void test_correctness(void) {
-  std::cout << "Testing algorithm 1:randomized quickselect for correctness\n\n";
-  correctness_1(alg1::select);
-  correctness_2(alg1::select);
-  /**/
-  std::cout << "Testing algorithm 2: deterministic quickselect\n\n";
-  correctness_1(alg2::select);
-  correctness_2(alg2::select);
-  /**/
-  std::cout << "Testing algorithm 3:quicksort-select.\n\n";
-  correctness_1(alg3::select);
-  correctness_2(alg3::select);
+void correctness(void) {
+  std::cout << "Tabulating correctness for the algorithms." << std::endl;
+  std::cout << "\tShowing output: kth smallest in array given in specification" << std::endl;
+  std::cout << "\tIndexing start at k=0 yielding smallest element." << std::endl;
+  std::cout << "------------------------------------------------------------\n";
+  std::cout << "|" << std::setw(10) << "n" << "|";
+  for (int i = 0; i < 3; i++) {
+    std::cout << std::setw(14) << "algorithm " << i + 1 << "|";
+  }
+  std::cout << std::endl;
+  std::cout << "------------------------------------------------------------\n";
+  for (int k = 0; k < 19; ++k) {
+    correctness_row(k);
+  }
+  std::cout << "------------------------------------------------------------\n";
 }
 
-typedef int (*SelectFunctionPointer)(int *, int, int);
+} // namespace test_correctness
 
-float performance(SelectFunctionPointer select, int* arr, int n){
-    std::clock_t t0 = std::clock();
-    select(arr, n, n/2);
-    return (std::clock() - t0) / (float)(CLOCKS_PER_SEC / 1000);
-    return 0;
+namespace test_corner_cases{
+  void corner_cases(){
+    std::cout << "Testing corner-cases for the algorithm." << std::endl;
+    // case 1
+    std::cout << "\t # selecting from 1-element array\n";
+    for(int i = 0; i < 3; ++i){
+      int output;
+      int arr[] = {998};
+      output = selection_functions[i](arr, 1, 0);
+      if(output == 998){
+        std::cout << "\t\t Success: algorithm " << i+1 << std::endl;
+      } else {
+        std::cout << "\t\t Fail: algorithm " << i+1 << std::endl;
+        std::cout << "\t\t\t Actual output: " << output << std::endl;
+      }
+    }
+    // case 2
+    std::cout << "\t # selecting from sorted length-3 array\n";
+    for(int i = 0; i < 3; ++i){
+      int result[3];
+      std::cout << "\t\t algorithm " << i+1 << " outputted { ";
+      for(int j = 0; j < 3; ++j){
+        int arr[] = {1,2,3};
+        std::cout << selection_functions[i](arr, 3, j) << " ";
+      }
+      std::cout << "}.\n";
+    }
+
+    std::cout << "\t # selecting from reverse-sorted length-3 array\n";
+    for(int i = 0; i < 3; ++i){
+      int result[3];
+      std::cout << "\t\t algorithm " << i+1 << " outputted { ";
+      for(int j = 0; j < 3; ++j){
+        int arr[] = {3,2,1};
+        std::cout << selection_functions[i](arr, 3, j) << " ";
+      }
+      std::cout << "}.\n";
+    }
+  }
 }
 
-float* test_performance(int n){
-  int * arr;
+namespace test_performance {
+float performance_cell(SelectFunctionPointer select, int *arr, int n) {
+  std::clock_t t0 = std::clock();
+  select(arr, n, n / 2);
+  return (std::clock() - t0) / (float)(CLOCKS_PER_SEC / 1000);
+  return 0;
+}
 
-  SelectFunctionPointer funs[] = {alg1::select, alg2::select, alg3::select};
+float *performance_row(int n) {
+  int *arr;
 
-  std::cout << std::setw(10) << n;
-  for(int i=0; i<3; i++){
-    arr = random_array(n, 1, n/100);
-    std::cout << std::setw(15) << std::fixed << std::setprecision(2) << performance(funs[i], arr, n);
+  std::cout << "|" << std::setw(10) << n << "|";
+  for (int i = 0; i < 3; i++) {
+    arr = random_array(n, 1, n / 100);
+    std::cout << std::setw(15) << std::fixed << std::setprecision(2)
+              << performance_cell(selection_functions[i], arr, n) << "|";
     free(arr);
   }
   std::cout << std::endl;
-  
 }
 
-int main(){
-  test_correctness();
+int performance() {
   // performance
   std::cout << "Tabulating performances for the algorithms." << std::endl;
   std::cout << "Units are in milliseconds." << std::endl;
-  std::cout << std::setw(10) << "n";
-  for(int i = 0; i < 3; i ++){
-    std::cout << std::setw(15) << "algorithm " << i;
+  std::cout << "------------------------------------------------------------\n";
+  std::cout << "|" << std::setw(10) << "n" << "|";
+  for (int i = 0; i < 3; i++) {
+    std::cout << std::setw(14) << "algorithm " << i + 1 << "|";
   }
   std::cout << std::endl;
-  float* time_taken;
-  test_performance( 1e5);
-  test_performance( 3e5);
-  test_performance( 1e6);
-  test_performance( 3e6);
-  test_performance( 1e7);
-  test_performance( 3e7);
-  test_performance( 1e8);
-  test_performance( 3e8);
-  test_performance( 1e9);
-  //test_performance( 3e9); warning: overflow in implicit constant conversion
-
+  std::cout << "------------------------------------------------------------\n";
+  float *time_taken;
+  performance_row(1e5);
+  performance_row(3e5);
+  performance_row(1e6);
+  performance_row(3e6);/*
+  performance_row(1e7);
+  performance_row(3e7);
+  performance_row(1e8);
+  performance_row(3e8);
+  performance_row(1e9);*/
+  // test_performance( 3e9); warning: overflow in implicit constant conversion
+  std::cout << "------------------------------------------------------------\n";
   return 0;
+}
+} // namespace test_performance
+
+int main(){
+  test_correctness::correctness();
+  test_corner_cases::corner_cases();
+  test_performance::performance();
 }
