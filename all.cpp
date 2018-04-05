@@ -321,13 +321,14 @@ int performance() {
   performance_row(1e5);
   performance_row(3e5);
   performance_row(1e6);
-  performance_row(3e6);/*
+  performance_row(3e6);
   performance_row(1e7);
   performance_row(3e7);
   performance_row(1e8);
   performance_row(3e8);
-  performance_row(1e9);*/
-  // test_performance( 3e9); warning: overflow in implicit constant conversion
+  performance_row(1e9);
+  performance_row(3e9); //warning: overflow in implicit constant conversion
+  performance_row(1e10); //warning: overflow in implicit constant conversion
   std::cout << "------------------------------------------------------------\n";
   return 0;
 }
